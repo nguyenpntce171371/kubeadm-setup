@@ -54,7 +54,7 @@ systemctl enable docker.service
 #----------------------
 
 kubeadm config images pull
-kubeadm init --pod-network-cidr=192.168.56.10/16 --kubernetes-version=1.32.3 --ignore-preflight-errors=all
+kubeadm init --control-plane-endpoint=192.168.56.10 --apiserver-advertise-address=192.168.56.10 --pod-network-cidr=192.168.56.0/24 --kubernetes-version=1.32.3 --ignore-preflight-errors=all
 
 #------------------
 
