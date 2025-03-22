@@ -34,13 +34,15 @@ sysctl --system
 
 mkdir /etc/apt/keyrings
 curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-focal main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 #-----------
 
 apt update
 apt install -y apt-transport-https ca-certificates curl
-apt install -y kubelet kubeadm kubelet docker.io kubectl
+apt install -y kubelet kubeadm docker.io
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 apt-mark hold kubelet kubeadm kubectl docker.io
 mkdir /etc/containerd
 containerd config default > /etc/containerd/config.toml
