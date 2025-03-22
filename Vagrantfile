@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
   end
 
   (1..2).each do |i|
-    config.vm.define worker#{i} do |worker|
-      worker.vm.hostname = worker#{i}
+    config.vm.define "worker#{i}" do |worker|
+      worker.vm.hostname = "worker#{i}"
       worker.vm.network "private_network", ip: "192.168.56.1#{i}"
       worker.vm.provider "virtualbox" do |vb|
         vb.memory = "2048"
