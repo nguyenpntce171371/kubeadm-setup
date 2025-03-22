@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql
+  namespace: my-namespace
 spec:
   ports:
     - port: 3306
@@ -10,10 +11,12 @@ spec:
     app: mysql
 
 ---
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mysql
+  namespace: my-namespace
 spec:
   serviceName: "mysql"
   replicas: 3
