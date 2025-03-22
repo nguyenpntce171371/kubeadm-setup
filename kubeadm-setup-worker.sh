@@ -5,14 +5,11 @@ sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 apt update
 apt full-upgrade -y
-apt install -y apt-transport-https ca-certificates curl
-
-curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-focal main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-apt update
-apt install -y apt-transport-https ca-certificates curl
-apt install -y kubelet kubeadm kubelet docker.io
+sudo apt-get install -y apt-transport-https ca-certificates curl
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+apt-get install -y kubelet kubeadm kubectl containerd docker.io
 
 mkdir /etc/containerd
 containerd config default > /etc/containerd/config.toml
@@ -23,3 +20,5 @@ systemctl restart kubelet.service
 systemctl start docker.service
 systemctl enable kubelet.service
 systemctl enable docker.service
+
+
