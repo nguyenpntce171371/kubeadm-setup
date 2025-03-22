@@ -52,7 +52,7 @@ systemctl enable docker.service
 #----------------------
 
 kubeadm config images pull
-kubeadm init --pod-network-cidr=192.168.56.10/16 --pod-network-cidr=192.168.0.0/16 --kubernetes-version=1.32.3 --ignore-preflight-errors=all
+kubeadm init --pod-network-cidr=192.168.56.10/16 --kubernetes-version=1.32.3 --ignore-preflight-errors=all
 
 #------------------
 
