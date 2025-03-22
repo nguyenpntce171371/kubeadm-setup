@@ -54,7 +54,7 @@ systemctl enable docker.service
 #----------------------
 
 kubeadm config images pull
-kubeadm init --apiserver-advertise-address=192.168.56.2 --pod-network-cidr=10.244.0.0/16
+kubeadm init --apiserver-advertise-address=192.168.56.2 --pod-network-cidr=10.244.0.0/16 --kubernetes-version=1.32.3 --ignore-preflight-errors=all
 
 #------------------
 
@@ -64,7 +64,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 #------------
 
-kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml
+#kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml
 
 #-----------
 
