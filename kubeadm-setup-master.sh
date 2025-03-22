@@ -1,5 +1,7 @@
 #! /bin/bash
 
+/sbin/iptables -P FORWARD ACCEPT
+
 swapoff -a
 sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 apt update
