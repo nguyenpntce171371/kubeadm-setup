@@ -1,16 +1,23 @@
+# Persistent Volume
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mysql-pv
+  labels:
+    app: mysql
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: "manual"
   hostPath:
     path: "/mnt/data/mysql"
 
 ---
+
+# Persistent Volume Claim
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -21,3 +28,4 @@ spec:
   resources:
     requests:
       storage: 5Gi
+  storageClassName: "manual"
