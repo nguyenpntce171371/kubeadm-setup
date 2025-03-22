@@ -64,7 +64,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 #------------
 
-#kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml
+kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml
 
 #-----------
 
