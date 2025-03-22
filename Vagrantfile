@@ -1,4 +1,3 @@
-  GNU nano 8.3                     Vagrantfile *                             
 Vagrant.configure("2") do |config|
 
   config.vm.box = "ubuntu/focal64"
