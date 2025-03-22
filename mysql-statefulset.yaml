@@ -38,5 +38,7 @@ spec:
       resources:
         requests:
           storage: 10Gi
-      hostPath: #thêm hostPath vào đây.
-        path: "/mnt/data/mysql"
+      volumeMode: Filesystem
+      hostPath:
+        path: "/mnt/data/mysql/${HOSTNAME}" # thay đổi path ở đây.
+        type: DirectoryOrCreate
