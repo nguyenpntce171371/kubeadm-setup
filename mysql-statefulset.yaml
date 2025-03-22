@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mysql
+  namespace: my-namespace
   labels:
     app: mysql
 spec:
@@ -17,13 +18,12 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:8.0
+          image: percona/percona-xtradb-cluster:8.0
           env:
             - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-pass
-                  key: password
+              value: "mypassword"
+            - name: CLUSTER_NAME
+              value: "k8s-cluster"
           ports:
             - containerPort: 3306
               name: mysql
@@ -33,6 +33,7 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: mysql-storage
+        namespace: my-namespace
       spec:
         accessModes:
           - ReadWriteOnce
