@@ -1,23 +1,34 @@
+NUM_MASTER_NODE = 1
+NUM_WORKER_NODE = 2
+
+IP_NW = "192.168.56."
+MASTER_IP_START = 1
+NODE_IP_START = 2
+
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/focal64"
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.box_check_update = false
 
-  config.vm.define "master" do |master|
-    master.vm.hostname = "master"
-    master.vm.network "private_network", ip: "192.168.56.10"
-    master.vm.network "public_network", type: "dhcp"
-    master.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
-      vb.cpus = 2
+  (1..NUM_MASTER_NODE).each do |i|
+    config.vm.define "master" do |master|
+      master.vm.hostname = "master#{i}"
+      master.vm.network :private_network, ip: IP_NW + "#{MASTER_IP_START + i}"
+      master.vm.provider "virtualbox" do |vb|
+        vb.name = "master#{i}"
+        vb.memory = "2048"
+        vb.cpus = 2
+      end
     end
   end
+  
 
-  (1..2).each do |i|
+  (1..NUM_WORKER_NODE).each do |i|
     config.vm.define "worker#{i}" do |worker|
       worker.vm.hostname = "worker#{i}"
-      worker.vm.network "private_network", ip: "192.168.56.1#{i}"
-      worker.vm.network "public_network", type: "dhcp"
+      worker.vm.network :private_network, ip: IP_NW + "#{NODE_IP_START + i}"
       worker.vm.provider "virtualbox" do |vb|
+        vb.name = "worker#{i}"
         vb.memory = "2048"
         vb.cpus = 2
       end
