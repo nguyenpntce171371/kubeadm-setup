@@ -26,9 +26,6 @@ spec:
             - name: mysql-storage
               mountPath: /var/lib/mysql
   volumeClaimTemplates:
-    - metadata:
-        name: mysql-storage
-        namespace: my-namespace
       spec:
         accessModes:
           - ReadWriteOnce
