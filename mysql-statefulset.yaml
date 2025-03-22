@@ -1,26 +1,27 @@
+# Service cho StatefulSet
 apiVersion: v1
 kind: Service
 metadata:
   name: mysql
-  namespace: mysql-ha
   labels:
     app: mysql
 spec:
   ports:
     - port: 3306
-      name: mysql
   clusterIP: None
   selector:
     app: mysql
+
 ---
+
+# Triển khai StatefulSet MySQL
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mysql
-  namespace: mysql-ha
 spec:
   serviceName: "mysql"
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: mysql
@@ -31,34 +32,22 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:5.7
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-pass-root
-                  key: password
-            - name: MYSQL_USER
-              value: user
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-pass-user
-                  key: password
-            - name: MYSQL_DATABASE
-              value: medlor
+          image: mysql:8.0
           ports:
             - containerPort: 3306
               name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "password"
           volumeMounts:
-            - name: data
+            - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: mysql-persistent-storage
       spec:
-        accessModes:
-          - ReadWriteOnce
+        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 20Gi
+            storage: 5Gi
+        storageClassName: "manual"
