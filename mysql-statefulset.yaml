@@ -1,5 +1,10 @@
 apiVersion: apps/v1
 kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: mysql-ha
+  labels:
+    app: mysql
 spec:
   serviceName: "mysql"
   replicas: 3
@@ -19,13 +24,33 @@ spec:
               value: "mypassword"
             - name: CLUSTER_NAME
               value: "k8s-cluster"
+            - name: XTRABACKUP_PASSWORD
+              value: "backup-pass"
+            - name: MYSQL_ALLOW_EMPTY_PASSWORD
+              value: "1"
           ports:
             - containerPort: 3306
               name: mysql
           volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 2
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
   volumeClaimTemplates:
+    - metadata:
+        name: mysql-storage
       spec:
         accessModes:
           - ReadWriteOnce
