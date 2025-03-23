@@ -16,27 +16,27 @@ spec:
       containers:
         - name: mysql
           image: mysql:8.0
+          ports:
+            - containerPort: 3306
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "your_password"
-          ports:
-            - containerPort: 3306
+            - name: MYSQL_DATABASE
+              value: "sampledb"
           volumeMounts:
-            - name: mysql-persistent-storage
+            - name: data
               mountPath: /var/lib/mysql
-            - name: mysql-config
-              mountPath: /docker-entrypoint-initdb.d
+            - name: config
+              mountPath: /etc/mysql/conf.d
       volumes:
-        - name: mysql-config
+        - name: config
           configMap:
-            name: mysql-sample-data
+            name: mysql-config
   volumeClaimTemplates:
     - metadata:
-        name: mysql-persistent-storage
+        name: data
       spec:
-        accessModes:
-          - ReadWriteOnce
+        accessModes: ["ReadWriteOnce"]
         resources:
           requests:
             storage: 10Gi
-        storageClassName: manual
