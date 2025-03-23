@@ -4,6 +4,17 @@ metadata:
   name: mysql
 spec:
   ports:
-  - port: 3306
+    - port: 3306
+  clusterIP: None
+  selector:
+    app: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-read
+spec:
+  ports:
+    - port: 3306
   selector:
     app: mysql
