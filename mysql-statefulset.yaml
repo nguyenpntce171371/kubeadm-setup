@@ -28,7 +28,7 @@ spec:
               mountPath: /docker-entrypoint-initdb.d
   volumeClaimTemplates:
     - metadata:
-        name: mysql-persistent-storage
+        name: mysql-pvc # Change this to match the PVC name
       spec:
         accessModes:
           - ReadWriteOnce
