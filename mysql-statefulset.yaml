@@ -3,7 +3,6 @@ kind: StatefulSet
 metadata:
   name: mysql
 spec:
-  serviceName: "mysql"
   replicas: 3
   selector:
     matchLabels:
@@ -14,22 +13,27 @@ spec:
         app: mysql
     spec:
       containers:
-      - name: mysql
-        image: mysql:8.0
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: "your_password"
-        ports:
-        - containerPort: 3306
-        volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
-        - name: mysql-config
-          mountPath: /docker-entrypoint-initdb.d
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "password"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+            - name: mysql-config
+              mountPath: /docker-entrypoint-initdb.d
       volumes:
         - name: mysql-config
           configMap:
             name: mysql-sample-data
-        - name: mysql-persistent-storage
-          persistentVolumeClaim:
-            claimName: mysql-pvc-$(pod.metadata.labels['apps.kubernetes.io/pod-index'])
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-persistent-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
