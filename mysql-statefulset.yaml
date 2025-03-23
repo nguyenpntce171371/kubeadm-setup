@@ -26,6 +26,10 @@ spec:
               mountPath: /var/lib/mysql
             - name: mysql-config
               mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mysql-config
+          configMap:
+            name: mysql-sample-data
   volumeClaimTemplates:
     - metadata:
         name: mysql-persistent-storage
