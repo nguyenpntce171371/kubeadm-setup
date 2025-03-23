@@ -9,12 +9,11 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/mnt/data/mysql"
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc
+  name: data-mysql-0
 spec:
   accessModes:
     - ReadWriteOnce
