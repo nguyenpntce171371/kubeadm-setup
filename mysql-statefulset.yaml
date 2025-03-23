@@ -16,27 +16,29 @@ spec:
       containers:
         - name: mysql
           image: mysql:8.0
-          ports:
-            - containerPort: 3306
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "your_password"
             - name: MYSQL_DATABASE
               value: "sampledb"
+          ports:
+            - containerPort: 3306
           volumeMounts:
-            - name: data
+            - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
-            - name: config
+            - name: mysql-config
               mountPath: /etc/mysql/conf.d
       volumes:
-        - name: config
+        - name: mysql-config
           configMap:
             name: mysql-config
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: mysql-persistent-storage
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes:
+          - ReadWriteOnce
         resources:
           requests:
             storage: 10Gi
+        storageClassName: manual
