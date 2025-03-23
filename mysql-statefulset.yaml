@@ -19,15 +19,20 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "your_password"
-            - name: MYSQL_DATABASE
-              value: "sampledb"
+            - name: MYSQL_REPLICATION_MODE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name  
+            - name: MYSQL_MASTER_HOST
+              value: "mysql-0.mysql"  
           ports:
             - containerPort: 3306
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
             - name: mysql-config
-              mountPath: /etc/mysql/conf.d
+              mountPath: /etc/mysql/my.cnf
+              subPath: my.cnf  
       volumes:
         - name: mysql-config
           configMap:
