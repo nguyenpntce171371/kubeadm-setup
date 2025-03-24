@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-operator
+  namespace: mysql-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: mysql-operator
+  template:
+    metadata:
+      labels:
+        name: mysql-operator
+    spec:
+      serviceAccountName: mysql-operator-sa
+      containers:
+      - name: mysql-operator
+        image: mysql/operator:0.6.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MYSQL_OPERATOR_K8S_CLUSTER_DOMAIN
+          value: "cluster.local"  
+        - name: MYSQL_OPERATOR_DEFAULT_GR_OPTIONS
+          value: "group_replication_consistency=AFTER"
