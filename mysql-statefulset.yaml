@@ -102,7 +102,7 @@ spec:
             name: mysql-sample-data
   volumeClaimTemplates:
     - metadata:
-        name: mysql-persistent-storage
+        name: data
       spec:
         accessModes:
           - ReadWriteOnce
