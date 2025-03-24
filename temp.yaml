@@ -20,6 +20,6 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: MYSQL_OPERATOR_K8S_CLUSTER_DOMAIN
-          value: "cluster.local"  
+          value: "cluster.local"  # Sử dụng domain chính từ kết quả của bạn
         - name: MYSQL_OPERATOR_DEFAULT_GR_OPTIONS
           value: "group_replication_consistency=AFTER"
