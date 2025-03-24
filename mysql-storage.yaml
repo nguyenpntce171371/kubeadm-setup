@@ -1,31 +1,6 @@
-# Persistent Volume
-apiVersion: v1
-kind: PersistentVolume
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: mysql-pv
-  labels:
-    app: mysql
-spec:
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: "manual"
-  hostPath:
-    path: "/mnt/data/mysql"
-
----
-
-# Persistent Volume Claim
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: "manual"
+  name: fast-storage
+provisioner: kubernetes.io/gce-pd
+volumeBindingMode: Immediate
