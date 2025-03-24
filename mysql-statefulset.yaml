@@ -29,7 +29,7 @@ spec:
               chown -R mysql:mysql /var/log/mysql
               
               # Copy cấu hình master/slave về đúng /etc/my.cnf
-              if [[ ${ordinal} -eq 0 ]]; then
+              if [[ $HOSTNAME == "mysql-0" ]]; then
                 cp /mnt/master-config/my.cnf /etc/my.cnf
               else
                 sed "s/server-id=2/server-id=$((ordinal + 1))/" /mnt/slave-config/my.cnf > /etc/my.cnf
