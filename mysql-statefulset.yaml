@@ -25,7 +25,8 @@ spec:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
             - name: mysql-config
-              mountPath: /config
+              mountPath: /etc/my.cnf
+              subPathExpr: "my-$(STATEFULSET_ORDINAL).cnf" 
       volumes:
         - name: mysql-config
           configMap:
@@ -39,4 +40,3 @@ spec:
         resources:
           requests:
             storage: 10Gi
-        storageClassName: manual
