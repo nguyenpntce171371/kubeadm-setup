@@ -44,16 +44,19 @@ spec:
           image: mysql:8.0
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "your_password"
+              value: "nguyen"
           ports:
             - containerPort: 3306
           volumeMounts:
-            - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql
-            - name: mysql-log
-              mountPath: /var/log/mysql
-            - name: mysql-config
-              mountPath: /docker-entrypoint-initdb.d
+            - name: master-config
+              mountPath: /mnt/master-config
+              subPath: mysql-master-config
+            - name: slave-config
+              mountPath: /mnt/slave-config
+              subPath: mysql-slave-config
+            - name: mysql-sample-data
+              mountPath: /docker-entrypoint-initdb.d/mysqlsampledatabase.sql
+              subPath: mysqlsampledatabase.sql
           lifecycle:
             postStart:
               exec:
@@ -90,13 +93,11 @@ spec:
       volumes:
         - name: master-config
           configMap:
-            name: mysql-master-config
+            name: mysql-config
         - name: slave-config
           configMap:
-            name: mysql-slave-config
-        - name: mysql-log
-          emptyDir: {}
-        - name: mysql-config
+            name: mysql-config
+        - name: mysql-sample-data
           configMap:
             name: mysql-sample-data
   volumeClaimTemplates:
