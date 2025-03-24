@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-persistent-storage-mysql-0
+  name: data-mysql-0
   namespace: default
   labels:
     app: mysql
@@ -23,7 +23,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-persistent-storage-mysql-1
+  name: data-mysql-1
   namespace: default
   labels:
     app: mysql
@@ -45,7 +45,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-persistent-storage-mysql-2
+  name: data-mysql-2
   namespace: default
   labels:
     app: mysql
