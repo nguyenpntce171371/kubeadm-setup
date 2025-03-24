@@ -22,6 +22,7 @@ metadata:
     app.kubernetes.io/name: mysql
     readonly: "true"
 spec:
+  type: ClusterIP
   ports:
   - name: mysql
     port: 3306
