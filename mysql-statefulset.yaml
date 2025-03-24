@@ -107,3 +107,4 @@ spec:
         selector:
           matchLabels:
             app: mysql
+            statefulset.kubernetes.io/pod-name: mysql-0
