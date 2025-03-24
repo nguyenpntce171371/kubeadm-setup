@@ -104,3 +104,6 @@ spec:
           requests:
             storage: 10Gi
         storageClassName: manual
+        selector:
+          matchLabels:
+            app: mysql
