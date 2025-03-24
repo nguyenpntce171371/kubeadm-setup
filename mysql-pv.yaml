@@ -4,12 +4,14 @@ metadata:
   name: mysql-pv-0
   labels:
     app: mysql
+    statefulset.kubernetes.io/pod-name: mysql-0
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
   hostPath:
     path: /mnt/mysql-pv-0
 ---
@@ -19,12 +21,14 @@ metadata:
   name: mysql-pv-1
   labels:
     app: mysql
+    statefulset.kubernetes.io/pod-name: mysql-1
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
   hostPath:
     path: /mnt/mysql-pv-1
 ---
@@ -34,11 +38,13 @@ metadata:
   name: mysql-pv-2
   labels:
     app: mysql
+    statefulset.kubernetes.io/pod-name: mysql-2
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
   hostPath:
     path: /mnt/mysql-pv-2
