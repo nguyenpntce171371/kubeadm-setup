@@ -1,4 +1,7 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
 data:
   mysql-master-config: |
     [mysqld]
