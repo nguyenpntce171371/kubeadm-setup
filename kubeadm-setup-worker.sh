@@ -23,4 +23,6 @@ systemctl start docker.service
 systemctl enable kubelet.service
 systemctl enable docker.service
 
-
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y linux-generic-hwe-18.04
+sudo reboot
