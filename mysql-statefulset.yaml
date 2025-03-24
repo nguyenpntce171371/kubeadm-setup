@@ -13,25 +13,43 @@ spec:
       labels:
         app: mysql
     spec:
+      initContainers:
+        - name: copy-config
+          image: busybox
+          command: ['sh', '-c']
+          args:
+            - |
+              if [ "$(hostname)" == "mysql-0" ]; then
+                cp /config/my-master.cnf /etc/my.cnf;
+              elif [ "$(hostname)" == "mysql-1" ]; then
+                cp /config/my-slave1.cnf /etc/my.cnf;
+              else
+                cp /config/my-slave2.cnf /etc/my.cnf;
+              fi
+          volumeMounts:
+            - name: mysql-config
+              mountPath: /config
+            - name: mysql-config-runtime
+              mountPath: /etc
       containers:
         - name: mysql
           image: mysql:8.0
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "your_password"
-            - name: MYSQL_DATABASE
-              value: "sampledb"
           ports:
             - containerPort: 3306
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
-            - name: mysql-config
-              mountPath: /etc/mysql/conf.d
+            - name: mysql-config-runtime
+              mountPath: /etc
+
       volumes:
         - name: mysql-config
           configMap:
             name: mysql-config
+
   volumeClaimTemplates:
     - metadata:
         name: mysql-persistent-storage
