@@ -1,7 +1,15 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc-0
+  name: mysql-persistent-storage-mysql-0
+  namespace: default
+  labels:
+    app: mysql
+  finalizers:
+    - kubernetes.io/pvc-protection
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -9,11 +17,21 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: manual
+  volumeMode: Filesystem
+  volumeName: mysql-pv-0
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc-1
+  name: mysql-persistent-storage-mysql-1
+  namespace: default
+  labels:
+    app: mysql
+  finalizers:
+    - kubernetes.io/pvc-protection
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -21,11 +39,21 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: manual
+  volumeMode: Filesystem
+  volumeName: mysql-pv-1
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc-2
+  name: mysql-persistent-storage-mysql-2
+  namespace: default
+  labels:
+    app: mysql
+  finalizers:
+    - kubernetes.io/pvc-protection
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -33,3 +61,5 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: manual
+  volumeMode: Filesystem
+  volumeName: mysql-pv-2
