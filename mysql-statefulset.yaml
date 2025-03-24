@@ -14,80 +14,91 @@ spec:
         app: mysql
     spec:
       initContainers:
-      - name: init-mysql
-        image: mysql:8.0
-        command:
-        - bash
-        - "-c"
-        - |
-          # Tạo server-id từ chỉ số pod
-          [[ ${HOSTNAME} =~ -([0-9]+)$ ]] || exit 1
-          ordinal=${BASH_REMATCH[1]}
-          server_id=$((100 + $ordinal))
-          
-          # Tạo file cấu hình
-          cat > /etc/mysql/conf.d/replication.cnf <<EOF
-          [mysqld]
-          server-id=${server_id}
-          log_bin=mysql-bin
-          binlog_format=ROW
-          gtid_mode=ON
-          enforce_gtid_consistency=ON
-          log_slave_updates=ON
-          binlog_group_commit_sync_delay=100
-          skip_slave_start=ON
-          EOF
-          
-          # Thêm cấu hình đặc biệt cho master (pod-0)
-          if [[ ${ordinal} -eq 0 ]]; then
-            echo "binlog_group_commit_sync_no_delay_count=10" >> /etc/mysql/conf.d/replication.cnf
-          fi
-        volumeMounts:
-        - name: mysql-config-dir
-          mountPath: /etc/mysql/conf.d
+        - name: init-mysql
+          image: mysql:8.0
+          command:
+            - bash
+            - "-c"
+            - |
+              # Xác định pod index
+              [[ ${HOSTNAME} =~ -([0-9]+)$ ]] || exit 1
+              ordinal=${BASH_REMATCH[1]}
+              
+              # Tạo thư mục log và chỉnh quyền
+              mkdir -p /var/log/mysql
+              chown -R mysql:mysql /var/log/mysql
+              
+              # Copy cấu hình master/slave về đúng /etc/my.cnf
+              if [[ ${ordinal} -eq 0 ]]; then
+                cp /mnt/master-config/my.cnf /etc/my.cnf
+              else
+                sed "s/server-id=2/server-id=$((ordinal + 1))/" /mnt/slave-config/my.cnf > /etc/my.cnf
+              fi
+          volumeMounts:
+            - name: master-config
+              mountPath: /mnt/master-config
+            - name: slave-config
+              mountPath: /mnt/slave-config
       containers:
         - name: mysql
           image: mysql:8.0
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "your_password"
-            - name: MYSQL_INITDB_SKIP_TZINFO
-              value: "1"
           ports:
             - containerPort: 3306
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
+            - name: mysql-log
+              mountPath: /var/log/mysql
             - name: mysql-config
               mountPath: /docker-entrypoint-initdb.d
-            - name: mysql-config-dir
-              mountPath: /etc/mysql/conf.d
           lifecycle:
             postStart:
               exec:
                 command:
-                - bash
-                - "-c"
-                - |
-                  # Chờ MySQL khởi động hoàn toàn
-                  sleep 30
-                  
-                  # Chỉ thực hiện trên master (mysql-0)
-                  if [[ `hostname` == "mysql-0" ]]; then
-                    mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "$(cat /docker-entrypoint-initdb.d/master-init.sql)"
-                  else
-                    # Chờ master sẵn sàng
-                    until mysql -h mysql-0.mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1"; do
-                      sleep 5
-                    done
-                    mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "$(cat /docker-entrypoint-initdb.d/slave-init.sql)"
-                  fi
+                  - bash
+                  - "-c"
+                  - |
+                    # Chờ MySQL khởi động hoàn toàn
+                    sleep 30
+                    
+                    # Chỉ thực hiện trên master (mysql-0)
+                    if [[ `hostname` == "mysql-0" ]]; then
+                      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "
+                        CREATE USER 'repl'@'%' IDENTIFIED BY 'repl_password';
+                        GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+                        FLUSH PRIVILEGES;
+                      "
+                    else
+                      # Chờ master sẵn sàng
+                      until mysql -h mysql-0.mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1"; do
+                        sleep 5
+                      done
+                      
+                      # Thiết lập replication
+                      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "
+                        CHANGE MASTER TO
+                        MASTER_HOST='mysql-0.mysql',
+                        MASTER_USER='repl',
+                        MASTER_PASSWORD='repl_password',
+                        MASTER_AUTO_POSITION=1;
+                        START SLAVE;
+                      "
+                    fi
       volumes:
+        - name: master-config
+          configMap:
+            name: mysql-master-config
+        - name: slave-config
+          configMap:
+            name: mysql-slave-config
+        - name: mysql-log
+          emptyDir: {}
         - name: mysql-config
           configMap:
             name: mysql-sample-data
-        - name: mysql-config-dir
-          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
         name: mysql-persistent-storage
