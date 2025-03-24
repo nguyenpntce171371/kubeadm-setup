@@ -20,16 +20,16 @@ spec:
             - bash
             - "-c"
             - |
-              [[ ${HOSTNAME} =~ -([0-9]+)$ ]] || exit 1
-              ordinal=${BASH_REMATCH[1]}
+              ordinal=$(echo $HOSTNAME | grep -oE '[0-9]+$')
               
               mkdir -p /var/log/mysql
               chown -R mysql:mysql /var/log/mysql
               
-              if [[ $HOSTNAME == "mysql-0" ]]; then
-                cp /mnt/master-config/my.cnf /etc/my.cnf
+              if [[ "$ordinal" == "0" ]]; then
+                cp /mnt/config/mysql-master-config /etc/my.cnf
               else
-                sed "s/server-id=2/server-id=$((ordinal + 1))/" /mnt/slave-config/my.cnf > /etc/my.cnf
+                cp /mnt/config/mysql-slave-config /etc/my.cnf
+                sed -i "s/server-id=2/server-id=$((ordinal + 1))/" /etc/my.cnf
               fi
           volumeMounts:
             - name: mysql-config
