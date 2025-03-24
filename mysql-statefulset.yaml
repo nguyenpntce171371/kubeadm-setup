@@ -40,7 +40,6 @@ spec:
           volumeMounts:
             - name: mysql-config
               mountPath: /mnt/config
-
       containers:
         - name: mysql
           image: mysql:8.0
@@ -57,35 +56,6 @@ spec:
             - name: mysql-sample-data
               mountPath: /docker-entrypoint-initdb.d/mysqlsampledatabase.sql
               subPath: mysqlsampledatabase.sql
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - bash
-                  - "-c"
-                  - |
-                    sleep 30
-                    if [[ `hostname` == "mysql-0" ]]; then
-                      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "
-                        CREATE USER 'repl'@'%' IDENTIFIED BY 'repl_password';
-                        GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
-                        FLUSH PRIVILEGES;
-                      "
-                    else
-                      until mysql -h mysql-0.mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1"; do
-                        sleep 5
-                      done
-                      
-                      mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "
-                        CHANGE MASTER TO
-                        MASTER_HOST='mysql-0.mysql',
-                        MASTER_USER='repl',
-                        MASTER_PASSWORD='repl_password',
-                        MASTER_AUTO_POSITION=1;
-                        START SLAVE;
-                      "
-                    fi
-
       volumes:
         - name: mysql-config
           configMap:
