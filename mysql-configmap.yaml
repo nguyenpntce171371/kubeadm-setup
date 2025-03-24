@@ -3,13 +3,37 @@ kind: ConfigMap
 metadata:
   name: mysql-config
 data:
-  master.cnf: |
+  mysql-master-config: |
     [mysqld]
     server-id=1
-    log_bin=mysql-bin
-    binlog_do_db=sampledb
+    log_bin=/var/log/mysql/mysql-bin.log
+    bind-address=0.0.0.0
+    skip-host-cache
+    skip-name-resolve
+    datadir=/var/lib/mysql
+    socket=/var/run/mysqld/mysqld.sock
+    secure-file-priv=/var/lib/mysql-files
+    user=mysql
+    pid-file=/var/run/mysqld/mysqld.pid
 
-  slave.cnf: |
+    [client]
+    socket=/var/run/mysqld/mysqld.sock
+
+    !includedir /etc/mysql/conf.d/
+
+  mysql-slave-config: |
     [mysqld]
-    server-id=2
-    relay_log=relay-bin
+    server-id=2  
+    relay_log=mysql-relay
+    skip-host-cache
+    skip-name-resolve
+    datadir=/var/lib/mysql
+    socket=/var/run/mysqld/mysqld.sock
+    secure-file-priv=/var/lib/mysql-files
+    user=mysql
+    pid-file=/var/run/mysqld/mysqld.pid
+
+    [client]
+    socket=/var/run/mysqld/mysqld.sock
+
+    !includedir /etc/mysql/conf.d/
