@@ -1,41 +1,44 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-pv-0
+  name: data-mysql-0
+  labels:
+    app: mysql
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
-  storageClassName: manual
-  hostPath:
-    path: /mnt/data/mysql/0
   persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/data-mysql-0
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-pv-1
+  name: data-mysql-1
+  labels:
+    app: mysql
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
-  storageClassName: manual
-  hostPath:
-    path: /mnt/data/mysql/1
   persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/data-mysql-1
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-pv-2
+  name: data-mysql-2
+  labels:
+    app: mysql
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
-  storageClassName: manual
-  hostPath:
-    path: /mnt/data/mysql/2
   persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/data-mysql-2
