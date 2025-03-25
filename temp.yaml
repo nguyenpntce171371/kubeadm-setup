@@ -84,6 +84,8 @@ spec:
                       MASTER_AUTO_POSITION=1;
                       START SLAVE;"
                     fi
+
+                    exec mysqld
       volumes:
         - name: mysql-config
           configMap:
