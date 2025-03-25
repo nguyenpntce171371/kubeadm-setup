@@ -6,14 +6,9 @@ metadata:
     app: mysql
 spec:
   serviceName: "mysql"
-  replicas: 3
   selector:
     matchLabels:
       app: mysql
-  template:
-    metadata:
-      labels:
-        app: mysql
     spec:
       containers:
         - name: mysql
@@ -21,8 +16,6 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: "nguyen"
-          ports:
-            - containerPort: 3306
           volumeMounts:
             - name: data
               mountPath: /var/lib/mysql
@@ -51,11 +44,3 @@ spec:
         - name: mysql-slave-config
           configMap:
             name: mysql-slave-config
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 10Gi
