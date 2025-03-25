@@ -31,10 +31,9 @@ spec:
               - |
                 ordinal=$(echo $HOSTNAME | grep -o '[0-9]\+$')
                 if [[ "$ordinal" != "0" ]]; then
-                  cp /etc/mysql/conf.d/mysql.cnf /etc/mysql/conf.d/tmp.cnf
-                  cp /etc/mysql/conf.d/tmp.cnf /etc/mysql/conf.d/mysql.cnf
-                  sed -i "s/server-id=2/server-id=$((ordinal + 1))/" /etc/mysql/conf.d/mysql.cnf
-                  rm /etc/mysql/conf.d/tmp.cnf
+                  sed -i "s/server-id=2/server-id=$((ordinal + 1))/" /etc/mysql/conf.d/mysql-master.cnf
+                fi
+                cp /etc/mysql/conf.d/mysql-master.cnf /etc/my.cnf
 
   volumes:
     - name: mysql-master-config
