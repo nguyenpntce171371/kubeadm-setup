@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: mysql-slave-config
 data:
-  mysql.cnf: |
+  mysql-slave.cnf: |
     [mysqld]
     server-id=2
