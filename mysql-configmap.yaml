@@ -7,4 +7,9 @@ data:
     [mysqld]
     server-id=1
     log_bin=mysql-bin
-
+    bind-address=0.0.0.0
+  mysql-slave-config: |
+    [mysqld]
+    server-id=2
+    relay_log=mysql-relay
+    
