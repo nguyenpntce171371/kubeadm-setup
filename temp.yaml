@@ -38,6 +38,17 @@ spec:
             - name: mysql-master-config
               mountPath: /etc/mysql/conf.d/mysql-master.cnf
               subPath: mysql-master.cnf
+          readinessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-uroot", "-p$MYSQL_ROOT_PASSWORD"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          livenessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-uroot", "-p$MYSQL_ROOT_PASSWORD"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
           lifecycle:
             postStart:
               exec:
@@ -47,16 +58,35 @@ spec:
                   - |
                     ordinal=$(echo $HOSTNAME | grep -o '[0-9]\+$')
 
+                    timeout 60s bash -c 'until mysqladmin ping -uroot -p"$MYSQL_ROOT_PASSWORD" --silent; do sleep 2; done' || exit 1
+
                     if [[ "$ordinal" == "0" ]]; then
-                      sed -i "s/server-id=2/server-id=1/" /etc/mysql/conf.d/mysql-master.cnf
-                      sed -i '/^\[mysqld\]$/a bind-address = 0.0.0.0' /etc/mysql/conf.d/mysql-master.cnf
-                      sed -i '/server-id=1/a log_bin=/var/lib/mysql/mysql-bin.log\nbinlog_format=ROW\ngtid_mode=ON\nenforce-gtid-consistency=ON\nlog_slave_updates=ON\nread_only=OFF' /etc/mysql/conf.d/mysql-master.cnf
+                      mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
+                      SET GLOBAL server_id = $((ordinal + 1));
+                      SET GLOBAL log_bin = '/var/lib/mysql/mysql-bin.log';
+                      SET GLOBAL binlog_format = 'ROW';
+                      SET GLOBAL gtid_mode = 'ON';
+                      SET GLOBAL enforce_gtid_consistency = 'ON';
+                      SET GLOBAL log_slave_updates = 'ON';
+                      SET GLOBAL read_only = OFF;
+                      CREATE USER IF NOT EXISTS 'replica'@'%' IDENTIFIED BY 'replica_password';
+                      GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%';
+                      FLUSH PRIVILEGES;"
                     else
-                      sed -i "s/server-id=2/server-id=$((ordinal + 1))/" /etc/mysql/conf.d/mysql-master.cnf
-                      sed -i "/server-id=$((ordinal + 1))/a relay_log=/var/lib/mysql/mysql-relay-bin.log\nread_only=ON\nskip_slave_start=1" /etc/mysql/conf.d/mysql-master.cnf
+                      mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
+                      SET GLOBAL server_id = $((ordinal + 1));
+                      SET GLOBAL relay_log = '/var/lib/mysql/mysql-relay-bin.log';
+                      SET GLOBAL read_only = ON;
+                      SET GLOBAL skip_slave_start = 1;
+                      STOP SLAVE;
+                      RESET SLAVE ALL;
+                      CHANGE MASTER TO 
+                      MASTER_HOST='mysql-0.mysql.default.svc.cluster.local',
+                      MASTER_USER='replica',
+                      MASTER_PASSWORD='replica_password',
+                      MASTER_AUTO_POSITION=1;
+                      START SLAVE;"
                     fi
-                    
-                    cp /etc/mysql/conf.d/mysql-master.cnf /etc/my.cnf
       volumes:
         - name: mysql-config
           configMap:
