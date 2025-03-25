@@ -35,9 +35,6 @@ spec:
               mountPath: /var/lib/mysql
             - name: mysql-config
               mountPath: /docker-entrypoint-initdb.d
-            - name: mysql-master-config
-              mountPath: /etc/mysql/conf.d/mysql-master.cnf
-              subPath: mysql-master.cnf
           readinessProbe:
             exec:
               command: ["mysqladmin", "ping", "-uroot", "-p$MYSQL_ROOT_PASSWORD"]
@@ -92,9 +89,6 @@ spec:
           configMap:
             name: mysql-sample-data
             defaultMode: 420
-        - name: mysql-master-config
-          configMap:
-            name: mysql-master-config
   volumeClaimTemplates:
     - metadata:
         name: mysql-persistent-storage
