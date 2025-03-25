@@ -1,8 +1,21 @@
 apiVersion: v1
-kind: ConfigMap
+kind: Pod
 metadata:
-  name: mysql-config
-data:
-  mysql.cnf: |
-    [mysqld]
-    server-id=1
+  name: mysql
+spec:
+  containers:
+  - name: mysql
+    image: mysql:8.0
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: "nguyen"
+    volumeMounts:
+    - name: mysql-config
+      mountPath: /etc/mysql/conf.d/mysql.cnf
+      subPath: mysql.cnf
+    ports:
+    - containerPort: 3306
+  volumes:
+  - name: mysql-config
+    configMap:
+      name: mysql-config
