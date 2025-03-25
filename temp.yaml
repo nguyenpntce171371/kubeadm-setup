@@ -60,7 +60,6 @@ spec:
                     if [[ "$ordinal" == "0" ]]; then
                       mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
                       SET GLOBAL server_id = $((ordinal + 1));
-                      SET GLOBAL log_bin = '/var/lib/mysql/mysql-bin.log';
                       SET GLOBAL binlog_format = 'ROW';
                       SET GLOBAL gtid_mode = 'ON';
                       SET GLOBAL enforce_gtid_consistency = 'ON';
