@@ -48,6 +48,9 @@ spec:
                     ordinal=$(echo $HOSTNAME | grep -o '[0-9]\+$')
                     if [[ "$ordinal" != "0" ]]; then
                       sed -i "s/server-id=2/server-id=$((ordinal + 1))/" /etc/mysql/conf.d/mysql-master.cnf
+                      sed -i '/^\[mysqld\]$/a text here' /etc/mysql/conf.d/mysql-master.cnf
+                    else
+                      sed -i '/^\[mysqld\]$/a text here' /etc/mysql/conf.d/mysql-master.cnf
                     fi
                     cp /etc/mysql/conf.d/mysql-master.cnf /etc/my.cnf
       volumes:
