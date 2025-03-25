@@ -66,6 +66,10 @@ spec:
                       SET GLOBAL enforce_gtid_consistency = 'ON';
                       SET GLOBAL log_slave_updates = 'ON';
                       SET GLOBAL read_only = OFF;
+                      SET GLOBAL enforce_gtid_consistency = ON;
+                      SET GLOBAL gtid_mode = OFF_PERMISSIVE;
+                      SET GLOBAL gtid_mode = ON_PERMISSIVE;
+                      SET GLOBAL gtid_mode = ON;
                       CREATE USER IF NOT EXISTS 'replica'@'%' IDENTIFIED BY 'replica_password';
                       GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%';
                       FLUSH PRIVILEGES;"
@@ -73,6 +77,10 @@ spec:
                       mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
                       SET GLOBAL server_id = $((ordinal + 1));
                       SET GLOBAL read_only = ON;
+                      SET GLOBAL enforce_gtid_consistency = ON;
+                      SET GLOBAL gtid_mode = OFF_PERMISSIVE;
+                      SET GLOBAL gtid_mode = ON_PERMISSIVE;
+                      SET GLOBAL gtid_mode = ON;
                       STOP SLAVE;
                       RESET SLAVE ALL;
                       CHANGE MASTER TO 
