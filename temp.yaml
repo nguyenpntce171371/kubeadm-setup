@@ -58,37 +58,9 @@ spec:
                     timeout 60s bash -c 'until mysqladmin ping -uroot -p"$MYSQL_ROOT_PASSWORD" --silent; do sleep 2; done' || exit 1
 
                     if [[ "$ordinal" == "0" ]]; then
-                      mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
-                      SET GLOBAL server_id = $((ordinal + 1));
-                      SET GLOBAL log_bin = '/var/lib/mysql/mysql-bin.log';
-                      SET GLOBAL binlog_format = 'ROW';
-                      SET GLOBAL gtid_mode = 'ON';
-                      SET GLOBAL enforce_gtid_consistency = 'ON';
-                      SET GLOBAL log_slave_updates = 'ON';
-                      SET GLOBAL read_only = OFF;
-                      SET GLOBAL enforce_gtid_consistency = ON;
-                      SET GLOBAL gtid_mode = OFF_PERMISSIVE;
-                      SET GLOBAL gtid_mode = ON_PERMISSIVE;
-                      SET GLOBAL gtid_mode = ON;
-                      CREATE USER IF NOT EXISTS 'replica'@'%' IDENTIFIED BY 'replica_password';
-                      GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%';
-                      FLUSH PRIVILEGES;"
+                      mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL server_id = $((ordinal + 1));"
                     else
-                      mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
-                      SET GLOBAL server_id = $((ordinal + 1));
-                      SET GLOBAL read_only = ON;
-                      SET GLOBAL enforce_gtid_consistency = ON;
-                      SET GLOBAL gtid_mode = OFF_PERMISSIVE;
-                      SET GLOBAL gtid_mode = ON_PERMISSIVE;
-                      SET GLOBAL gtid_mode = ON;
-                      STOP SLAVE;
-                      RESET SLAVE ALL;
-                      CHANGE MASTER TO 
-                      MASTER_HOST='mysql-0.mysql.default.svc.cluster.local',
-                      MASTER_USER='replica',
-                      MASTER_PASSWORD='replica_password',
-                      MASTER_AUTO_POSITION=1;
-                      START SLAVE;"
+                      mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL server_id = $((ordinal + 1));"
                     fi
       volumes:
         - name: mysql-config
