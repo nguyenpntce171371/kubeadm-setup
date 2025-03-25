@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  serviceName: "mysql"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mysql
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "nguyen"
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+            - name: mysql-config
+              mountPath: /docker-entrypoint-initdb.d
+            - name: mysql-master-config
+              mountPath: /etc/mysql/conf.d/mysql-master.cnf
+              subPath: mysql-master.cnf
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - bash
+                  - "-c"
+                  - |
+                    ordinal=$(echo $HOSTNAME | grep -o '[0-9]\+$')
+                    if [[ "$ordinal" != "0" ]]; then
+                      sed -i "s/server-id=2/server-id=$((ordinal + 1))/" /etc/mysql/conf.d/mysql-master.cnf
+                    fi
+                    cp /etc/mysql/conf.d/mysql-master.cnf /etc/my.cnf
+      volumes:
+        - name: mysql-config
+          configMap:
+            name: mysql-sample-data
+            defaultMode: 420
+        - name: mysql-master-config
+          configMap:
+            name: mysql-master-config
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-persistent-storage
+      spec:
+        accessModes: 
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: manual
+        volumeMode: Filesystem
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
