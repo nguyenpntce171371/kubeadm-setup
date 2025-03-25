@@ -1,24 +1,8 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: mysql
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mysql
-  template:
-    metadata:
-      labels:
-        app: mysql
-    spec:
-      containers:
-        - name: mysql
-          image: mysql:latest
-          volumeMounts:
-            - name: mysql-config-volume
-              mountPath: /etc/mysql/conf.d
-      volumes:
-        - name: mysql-config-volume
-          configMap:
-            name: mysql-config
+  name: mysql-config
+data:
+  mysql.cnf: |
+    [mysqld]
+    server-id=1
