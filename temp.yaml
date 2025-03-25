@@ -73,7 +73,7 @@ spec:
                     else
                       mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
                       SET GLOBAL server_id = $((ordinal + 1));
-                      SET GLOBAL read_only = 1;=
+                      SET GLOBAL read_only = 1;
                       SET GLOBAL enforce_gtid_consistency = ON;
                       SET GLOBAL gtid_mode = OFF_PERMISSIVE;
                       SET GLOBAL gtid_mode = ON_PERMISSIVE;
