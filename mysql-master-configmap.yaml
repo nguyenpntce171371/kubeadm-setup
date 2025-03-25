@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: mysql-master-config
 data:
-  mysql.cnf: |
+  mysql-master.cnf: |
     [mysqld]
     server-id=1
